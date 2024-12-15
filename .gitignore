@@ -1,0 +1,8 @@
+# You should install it manually from artifacts of provided below action.
+# ---
+# https://github.com/harmonytf/discord-rpc/actions/runs/11324561423
+source/dependencies/windows
+
+## gmcommon
+projects
+development
