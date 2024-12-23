@@ -4,7 +4,7 @@ A binary module that implements Discord Rich Presence functionality for Garry's 
 
 ## Installation
 
-1. Download the latest release from the [releases page](https://github.com/gmcl_drpc/releases/latest)
+1. Download the latest release from the [releases page](https://github.com/shockpast/gmcl_drpc/releases/latest)
 2. Place the binary module in your Garry's Mod `garrysmod/lua/bin` folder
 
 ## Usage
