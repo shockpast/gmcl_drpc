@@ -14,7 +14,6 @@ GMOD_MODULE_CLOSE()
 {
 	Discord_Shutdown();
 
-	// elegantly remove our table
 	LUA->PushSpecial(GarrysMod::Lua::SPECIAL_GLOB);
 	LUA->PushNil();
 	LUA->SetField(-2, "DiscordRPC");

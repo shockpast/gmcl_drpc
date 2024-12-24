@@ -6,12 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 
-static bool _initialized = false;
-
 LUA_FUNCTION_STATIC(L_UpdatePresence)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::TABLE);
-		
+
 	DiscordRichPresence _presence;
 	memset(&_presence, 0, sizeof(_presence));
 
@@ -38,7 +36,7 @@ LUA_FUNCTION_STATIC(L_UpdatePresence)
 	LUA->GetField(-1, "small_image_text");
 	_presence.smallImageText = LUA->GetString(-1);
 	LUA->Pop();
-	
+
 	LUA->GetField(-1, "start_timestamp");
 	_presence.startTimestamp = LUA->GetNumber(-1);
 	LUA->Pop();
@@ -82,6 +80,7 @@ LUA_FUNCTION_STATIC(L_UpdatePresence)
 	LUA->GetField(-1, "buttons");
 	if (LUA->IsType(-1, GarrysMod::Lua::Type::Table)) {
 		int buttonCount = LUA->ObjLen(-1);
+
 		DiscordButton* buttons = new DiscordButton[buttonCount + 1];
 		memset(buttons, 0, sizeof(DiscordButton) * (buttonCount + 1));
 
@@ -118,50 +117,7 @@ LUA_FUNCTION_STATIC(L_UpdatePresence)
 LUA_FUNCTION_STATIC(L_Initialize)
 {
 	DiscordEventHandlers _handlers;
-
-	_handlers.joinRequest = [](const DiscordUser* request)
-	{
-		printf("[ drpc ] received request from %s (%d) to join our game\n", request->globalName, request->userId);
-		Discord_Respond(request->userId, DISCORD_REPLY_NO);
-	};
-	_handlers.ready = [](const DiscordUser* user)
-	{
-		printf("[ drpc ] discord rpc is ready\n");
-	};
-	_handlers.disconnected = [](int errorCode, const char* message)
-	{
-		printf("[ drpc ] disconnected from discord rpc: %d - %s\n", errorCode, message);
-	};
-	_handlers.errored = [](int errorCode, const char* message)
-	{
-		printf("[ drpc ] error in discord rpc: %d - %s\n", errorCode, message);
-	};
-	_handlers.joinGame = [](const char* joinSecret)
-	{
-		printf("[ drpc ] join game request: %s\n", joinSecret);
-	};
-	_handlers.spectateGame = [](const char* spectateSecret)
-	{
-		printf("[ drpc ] spectate game request: %s\n", spectateSecret);
-	};
-	_handlers.debug = [](char isOut, const char* opcodeName, const char* message, uint32_t messageLength)
-	{
-		printf("[ drpc ] debug: %s - %s\n", opcodeName, message);
-	};
-	_handlers.invited = [](int8_t type, const DiscordUser* user, const DiscordRichPresence* activity, const char* sessionId, const char* channelId, const char* messageId)
-	{
-		printf("[ drpc ] Received invite type: %i, from user: %s, with activity state: %s, with session id: %s, "
-			"from channel id: %s, with message id: %s\n",
-			type,
-			user->username,
-			activity->state,
-			sessionId,
-			channelId,
-			messageId);
-	};
-
 	Discord_Initialize(LUA->CheckString(1), &_handlers, 1, LUA->GetType(-2) == GarrysMod::Lua::Type::String ? LUA->GetString(2) : nullptr);
-	_initialized = true;
 
 	return 0;
 }
@@ -169,8 +125,6 @@ LUA_FUNCTION_STATIC(L_Initialize)
 LUA_FUNCTION_STATIC(L_Shutdown)
 {
 	Discord_Shutdown();
-	_initialized = false;
-
 	return 0;
 }
 
@@ -194,9 +148,6 @@ void DRPC::Initialize(GarrysMod::Lua::ILuaBase* LUA)
 
 			LUA->PushCFunction(L_RunCallbacks__Internal);
 			LUA->SetField(-2, "RunCallbacks__Internal");
-
-			LUA->PushBool(_initialized);
-			LUA->SetField(-2, "Initialized");
 		LUA->SetField(-2, "DiscordRPC");
 	LUA->Pop();
 }
